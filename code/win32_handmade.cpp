@@ -1,9 +1,4 @@
-#include <windows.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <Xinput.h>
-#include <dsound.h>
-#include <math.h>
 
 #define internal static
 #define local_persist static
@@ -24,6 +19,14 @@ typedef uint64_t uint64;
 
 typedef float real32;
 typedef double real64;
+
+#include "handmade.cpp"
+
+#include <windows.h>
+#include <stdio.h>
+#include <Xinput.h>
+#include <dsound.h>
+#include <math.h>
 
 struct win32_offscreen_buffer
 {
@@ -164,26 +167,6 @@ internal win32_window_dimension Win32GetWindowDimension(HWND Window)
 }
 
 internal void
-RenderWeirdGradient(win32_offscreen_buffer *Buffer, int BlueOffset, int GreenOffset)
-{
-    uint8 *Row = (uint8 *)Buffer->Memory;
-    for (int Y = 0; Y < Buffer->Height; ++Y)
-    {
-        uint32 *Pixel = (uint32 *)Row;
-        for (int X = 0; X < Buffer->Width; ++X)
-        {
-            uint8 BB = X + BlueOffset;
-            uint8 GG = Y + GreenOffset;
-            uint8 RR = 0;
-
-            *Pixel++ = (RR << 16) | (GG << 8) | BB;
-        }
-
-        Row += Buffer->Pitch;
-    }
-}
-
-internal void
 Win32ResizeDIBSection(win32_offscreen_buffer *Buffer, int Width, int Height)
 {
     if (Buffer->Memory)
@@ -239,122 +222,122 @@ Win32MainWindowCallback(HWND Window,
 
     switch (Message)
     {
-    case WM_SIZE:
-    {
-    }
-    break;
+        case WM_SIZE:
+        {
+        }
+        break;
 
-    case WM_DESTROY:
-    {
-        OutputDebugStringA("WM_DESTROY\n");
-        GlobalRunning = false;
-    }
-    break;
-
-    case WM_CLOSE:
-    {
-        GlobalRunning = false;
-        OutputDebugStringA("WM_CLOSE\n");
-    }
-    break;
-
-    case WM_ACTIVATEAPP:
-    {
-        OutputDebugStringA("WM_ACTIVATEAPP\n");
-    }
-    break;
-
-    case WM_SYSKEYDOWN:
-    case WM_SYSKEYUP:
-    case WM_KEYDOWN:
-    case WM_KEYUP:
-    {
-        uint32 VKCode = WParam;
-        bool32 WasDown = ((LParam & (1 << 30)) != 0);
-        bool32 IsDown = ((LParam & (1 << 31)) == 0);
-        if (WasDown == IsDown)
+        case WM_DESTROY:
         {
-            break;
-        }
-
-        if (VKCode == 'W')
-        {
-        }
-        else if (VKCode == 'A')
-        {
-        }
-        else if (VKCode == 'S')
-        {
-        }
-        else if (VKCode == 'D')
-        {
-        }
-        else if (VKCode == 'Q')
-        {
-        }
-        else if (VKCode == 'E')
-        {
-        }
-        else if (VKCode == VK_ESCAPE)
-        {
-            if (IsDown)
-            {
-                OutputDebugStringA("ESCAPE: IsDown\n");
-            }
-            else
-            {
-                OutputDebugStringA("ESCAPE: IsUp\n");
-            }
-        }
-        else if (VKCode == VK_UP)
-        {
-        }
-        else if (VKCode == VK_DOWN)
-        {
-        }
-        else if (VKCode == VK_LEFT)
-        {
-        }
-        else if (VKCode == VK_RIGHT)
-        {
-        }
-        else if (VKCode == VK_SPACE)
-        {
-        }
-
-        bool32 AltKeyWasDown = LParam & (1 << 29);
-        if (AltKeyWasDown && VKCode == VK_F4)
-        {
+            OutputDebugStringA("WM_DESTROY\n");
             GlobalRunning = false;
         }
-    }
-    break;
+        break;
 
-    case WM_PAINT:
-    {
-        PAINTSTRUCT Paint;
-        HDC DeviceContext = BeginPaint(Window, &Paint);
-        int X = Paint.rcPaint.left;
-        int Y = Paint.rcPaint.top;
-        int Width = Paint.rcPaint.right - X;
-        int Height = Paint.rcPaint.bottom - Y;
+        case WM_CLOSE:
+        {
+            GlobalRunning = false;
+            OutputDebugStringA("WM_CLOSE\n");
+        }
+        break;
 
-        win32_window_dimension Dimension = Win32GetWindowDimension(Window);
-        Win32DisplayBufferInWindow(
-            &GlobalBackBuffer, DeviceContext,
-            Dimension.Width, Dimension.Height
-        );
+        case WM_ACTIVATEAPP:
+        {
+            OutputDebugStringA("WM_ACTIVATEAPP\n");
+        }
+        break;
 
-        EndPaint(Window, &Paint);
-    }
-    break;
+        case WM_SYSKEYDOWN:
+        case WM_SYSKEYUP:
+        case WM_KEYDOWN:
+        case WM_KEYUP:
+        {
+            uint32 VKCode = WParam;
+            bool32 WasDown = ((LParam & (1 << 30)) != 0);
+            bool32 IsDown = ((LParam & (1 << 31)) == 0);
+            if (WasDown == IsDown)
+            {
+                break;
+            }
 
-    default:
-    {
-        // OutputDebugStringA("WM_DESTROY\n");
-        Result = DefWindowProc(Window, Message, WParam, LParam);
-    }
-    break;
+            if (VKCode == 'W')
+            {
+            }
+            else if (VKCode == 'A')
+            {
+            }
+            else if (VKCode == 'S')
+            {
+            }
+            else if (VKCode == 'D')
+            {
+            }
+            else if (VKCode == 'Q')
+            {
+            }
+            else if (VKCode == 'E')
+            {
+            }
+            else if (VKCode == VK_ESCAPE)
+            {
+                if (IsDown)
+                {
+                    OutputDebugStringA("ESCAPE: IsDown\n");
+                }
+                else
+                {
+                    OutputDebugStringA("ESCAPE: IsUp\n");
+                }
+            }
+            else if (VKCode == VK_UP)
+            {
+            }
+            else if (VKCode == VK_DOWN)
+            {
+            }
+            else if (VKCode == VK_LEFT)
+            {
+            }
+            else if (VKCode == VK_RIGHT)
+            {
+            }
+            else if (VKCode == VK_SPACE)
+            {
+            }
+
+            bool32 AltKeyWasDown = LParam & (1 << 29);
+            if (AltKeyWasDown && VKCode == VK_F4)
+            {
+                GlobalRunning = false;
+            }
+        }
+        break;
+
+        case WM_PAINT:
+        {
+            PAINTSTRUCT Paint;
+            HDC DeviceContext = BeginPaint(Window, &Paint);
+            int X = Paint.rcPaint.left;
+            int Y = Paint.rcPaint.top;
+            int Width = Paint.rcPaint.right - X;
+            int Height = Paint.rcPaint.bottom - Y;
+
+            win32_window_dimension Dimension = Win32GetWindowDimension(Window);
+            Win32DisplayBufferInWindow(
+                &GlobalBackBuffer, DeviceContext,
+                Dimension.Width, Dimension.Height
+            );
+
+            EndPaint(Window, &Paint);
+        }
+        break;
+
+        default:
+        {
+            // OutputDebugStringA("WM_DESTROY\n");
+            Result = DefWindowProc(Window, Message, WParam, LParam);
+        }
+        break;
     }
 
     return Result;
@@ -461,8 +444,8 @@ WinMain(HINSTANCE Instance,
             GlobalRunning = true;
 
             // NOTE: Teste do gradiente
-            int xOffset = 0;
-            int yOffset = 0;
+            int XOffset = 0;
+            int YOffset = 0;
 
             win32_sound_output SoundOutput = {};
             SoundOutput.SamplesPerSecond = 48000;
@@ -522,8 +505,8 @@ WinMain(HINSTANCE Instance,
                         int16 StickX = Pad->sThumbLX;
                         int16 StickY = Pad->sThumbLY;
 
-                        xOffset += StickX / 4096;
-                        yOffset += StickY / 4096;
+                        XOffset += StickX / 4096;
+                        YOffset += StickY / 4096;
 
                         if (XButton)
                         {
@@ -547,14 +530,21 @@ WinMain(HINSTANCE Instance,
                     }
                 }
 
-                RenderWeirdGradient(&GlobalBackBuffer, xOffset, yOffset);
+                game_offscreen_buffer Buffer = {};
+                Buffer.Memory = GlobalBackBuffer.Memory;
+                Buffer.Width = GlobalBackBuffer.Width;
+                Buffer.Height = GlobalBackBuffer.Height;
+                Buffer.Pitch = GlobalBackBuffer.Pitch;
+                GameUpdateAndRender(&Buffer, XOffset, YOffset);
 
                 DWORD PlayCursor;
                 DWORD WriteCursor;
                 if (SUCCEEDED(GlobalSecondaryBuffer->GetCurrentPosition(&PlayCursor, &WriteCursor)))
                 {
-                    DWORD ByteToLock = (SoundOutput.RunningSampleIndex * SoundOutput.BytesPerSample) % SoundOutput.SecondaryBufferSize;
-                    DWORD TargetCursor = (PlayCursor + (SoundOutput.LatencySampleCount * SoundOutput.BytesPerSample)) % SoundOutput.SecondaryBufferSize;
+                    DWORD ByteToLock = (SoundOutput.RunningSampleIndex * SoundOutput.BytesPerSample)
+                        % SoundOutput.SecondaryBufferSize;
+                    DWORD TargetCursor = (PlayCursor + (SoundOutput.LatencySampleCount * SoundOutput.BytesPerSample))
+                        % SoundOutput.SecondaryBufferSize;
                     DWORD BytesToWrite;
                     if (ByteToLock > TargetCursor)
                     {
@@ -588,9 +578,9 @@ WinMain(HINSTANCE Instance,
                 real32 FPS = (real32)PerfCountFrequency / (real32)CounterElapsed;
                 real32 MegaCyclesPerFrame = (real32)CyclesElapsed / (1000.0f * 1000.0f);
 
-                char Buffer[256];
-                sprintf(Buffer, "%.02fms/f, %.02ff/s, %.02fmc/f\n", MSPerFrame, FPS, MegaCyclesPerFrame);
-                OutputDebugStringA(Buffer);
+                char DebugBuffer[256];
+                sprintf(DebugBuffer, "%.02fms/f, %.02ff/s, %.02fmc/f\n", MSPerFrame, FPS, MegaCyclesPerFrame);
+                OutputDebugStringA(DebugBuffer);
 
                 LastCounter = EndCounter;
                 LastCycleCount = EndCycleCount;
